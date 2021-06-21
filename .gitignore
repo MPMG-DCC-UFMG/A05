@@ -1,0 +1,7 @@
+# .gitignore 
+api/node_modules
+api/package-lock.json
+api/src/data/*
+api/src/.env
+viz/node_modules
+viz/package-lock.json
