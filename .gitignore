@@ -1,4 +1,5 @@
 # .gitignore 
+testing_*
 api/node_modules
 api/package-lock.json
 api/src/data/*
