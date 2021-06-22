@@ -4,7 +4,7 @@ Projeto para visualização de dados
 ## REPOSITÓRIO
 Este repositório é divido em dois projetos NodeJS: API (backend) e VIZ (frontend)
 
-Apos clonar o repositório, instale as dependências do projeto, executando:
+Após clonar o repositório, instale as dependências do projeto com o comando:
 
 ### `npm install`
 
@@ -27,4 +27,4 @@ Ambos projetos podem ser execuados com:
 
 e para o VIZ funcionar corretamente é necessário que o API esteja sendo executado.
 
-Para navegar nas visualizações, abra [http://localhost:8000/dashboard](http://localhost:8000/dashboard) no navaegador.
+Para navegar nas visualizações, abra [http://localhost:8000/dashboard](http://localhost:8000/dashboard) no navegador.
