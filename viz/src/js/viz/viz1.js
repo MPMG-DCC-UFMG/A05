@@ -1,8 +1,10 @@
 $(function () {
 
+  const mainDiv = "#boxplotViz"
+
   plot = (data, update) => {
     const height = 600
-    const width = $("#main")[0].scrollWidth
+    const width = $(mainDiv)[0].scrollWidth
     const margin = {
       top: 25,
       bottom: 25,
@@ -14,13 +16,11 @@ $(function () {
 
     let svg = undefined
 
-    console.log(update)
-
     if (update) {
-      svg = d3.select("#main").select("svg").select("g")
+      svg = d3.select(mainDiv).select("svg").select("g")
       svg.selectAll("*").remove()
     } else {
-      svg = d3.select("#main").append("svg")
+      svg = d3.select(mainDiv).append("svg")
         .attr("class", "viz1")
         .attr("width", width)
         .attr("height", height)
@@ -44,13 +44,22 @@ $(function () {
 
     displayLoading(false)
 
-    $("#total").html(parseInt(boxplotData.reduce((sum, d) => d.qtde + sum, 0) / boxplotData.length))
-    $("#incomuns").html(parseInt(histogramData.reduce((sum, d) => d.bin_height + sum, 0) / histogramData.length))
+    const total = +boxplotData.reduce((sum, d) => +d.qtde + sum, 0) / boxplotData.length
+    const anomalias = +d3.format(".0f")(+histogramData.reduce((sum, d) => +d.bin_height + sum, 0) / histogramNest.length)
+    const percAnomalis = d3.format(".2f")(+anomalias / +total).replace('.', ',')
+    const normal = +d3.format(".0f")(total - anomalias)
+    const percNormal = d3.format(".2f")(+normal / +total).replace('.', ',')
+
+    $("#cardTotal").html(total.toLocaleString('pt-BR'))
+    $("#cardAnomalia").html(`${anomalias.toLocaleString('pt-BR')}`)
+    $("#cardPercAnomalia").html(`Anomalias (${percAnomalis}%)`)
+    $("#cardNormal").html(`${normal.toLocaleString('pt-BR')}`)
+    $("#cardPercNormal").html(`Normal (${percNormal}%)`)
 
     const measures = { height, width, margin, innerWidth, innerHeight }
 
-    const scaleBoxplot = boxplot(boxplotData, svg, measures)
-    histogram(histogramNest, svg, measures, scaleBoxplot, maxUppeFence, bins)
+    const scaleBoxplot = boxplot(boxplotData, svg, measures, maxUppeFence, percNormal)
+    histogram(histogramNest, svg, measures, scaleBoxplot, maxUppeFence, bins, percAnomalis)
 
     //return { svg, measures: { height, width, margin, innerWidth, innerHeight } }
   }
@@ -68,16 +77,61 @@ $(function () {
       headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
-    }).catch(function (error) {
+    }).catch(error => {
       displayError("Sem conexão com o servidor!")
       console.log(error)
-    }).then(function (data) {
+    }).then(data => {
       plot(data, update)
-    }).fin
+    })
   }
 
   $("#periodo").change(() => getData($("#periodo").val(), true))
 
   getData($("#periodo").val(), false)
+
+  getDataTable = (start, end, update) => {
+    displayLoading()
+    d3.json('http://localhost:7000/api/get_detail_viz_1/', {
+      method: "POST",
+      body: JSON.stringify({
+        "competencia": $("#periodo").val(),
+        start,
+        end,
+        update
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    }).catch(error => {
+      displayError("Sem conexão com o servidor!")
+      console.log(error)
+    }).then(data => {
+      console.log(data)
+    })
+  }
+
+
+  /*Papa.parse("data/s07_distancia_maxima_sample.csv", {
+    download: true,
+    complete: function (example) {
+      console.log(example.data)
+      $(document).ready(function () {
+        $('#distancia').DataTable({
+          data: example.data,
+          dataSrc: "",
+          columns: [
+            { title: "cns" },
+            { title: "nome" },
+            { title: "competencia" },
+            { title: "list_cidades" },
+            { title: "qtd_cidades" },
+            { title: "distancia_maxima" }
+          ]
+        })
+      })
+    }
+  })
+}*/
+
 
 })

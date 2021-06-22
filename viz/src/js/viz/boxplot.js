@@ -1,4 +1,4 @@
-boxplot = (data, svg, measures) => {
+boxplot = (data, svg, measures, maxUppeFence, perc) => {
 
   const { margin, innerWidth, innerHeight } = measures
 
@@ -59,19 +59,39 @@ boxplot = (data, svg, measures) => {
   svg.append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0, ${innerHeight})`)
-    .call(xAxis)
+    .call(xAxis.tickFormat(thousandFormat))
 
   svg.append("g")
     .attr("class", "x-axis-grid")
     .attr("transform", `translate(0, ${innerHeight})`)
     .call(xAxis.tickSize(-innerHeight).tickFormat('').tickSizeOuter(0))
 
+  const [domainMin, _] = domain
+
+  const normalScale = d3.scaleLinear()
+    .domain([domainMin, maxUppeFence])
+    .range([margin.left, scale(maxUppeFence)])
+
+  const xAxisNormal = d3.axisBottom(normalScale)
+  svg.append("g")
+    .attr("class", "x-axis-normal")
+    .call(xAxisNormal.tickValues([domainMin]).tickFormat(kmFormat))
+    .append("text")
+    .attr("fill", "rgb(70, 130, 180)")
+    .attr("text-anchor", "middle")
+    .attr("x", scale((maxUppeFence - margin.left) / 2))
+    .attr("y", "-5")
+    .text(`Normal (${perc}%)`)
+
   const yAxis = d3.axisLeft(d3.scaleBand()
-    .domain(quartiles.map(d => capitalize(
-      d.competencia.length == 6 ? // 201501 
-        new Date(_, +d.competencia.slice(-2), _).toLocaleString('pt-br', { month: 'short' }) :
-        d.competencia)
-    ))
+    .domain(quartiles.map(d => {
+      const year = +d.competencia.slice(4)
+      const month = +d.competencia.slice(-2) - 1
+      return capitalize(
+        d.competencia.length == 6 ? // 201501 
+          new Date(year, month).toLocaleString('pt-br', { month: 'short' }) :
+          d.competencia)
+    }))
     .range([margin.top, innerHeight])
     .paddingInner(0.3)
     .paddingOuter(0.2)

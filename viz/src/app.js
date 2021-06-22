@@ -8,15 +8,19 @@ app.use(express.static(__dirname + "/"));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.render('index');
 });
 
-app.get('/demo', function (req, res) {
-    res.render('demo');
+app.get('/dashboard', function(req, res) {
+    res.render('dashboard');
 });
 
-app.get('/barchart', function (req, res) {
+app.get('/datatables', function(req, res) {
+    res.render('datatables');
+});
+
+app.get('/barchart', function(req, res) {
     res.render('barchart');
 });
 

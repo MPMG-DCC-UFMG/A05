@@ -1,4 +1,4 @@
-histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins) => {
+histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins, perc) => {
 
   const { margin, innerHeight, innerWidth } = measures
 
@@ -20,8 +20,10 @@ histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins) => {
     .domain([0, maxHeight])
     .range([0, yCompetencias.bandwidth()])
 
+  const sortData = data.sort((a, b) => +a.competencia - +b.competencia)
+
   const hist = svg.selectAll(".hist")
-    .data(data)
+    .data(sortData)
     .enter().append("g")
     .attr('class', 'hists')
     .attr('transform', () => `translate(${[scaleBoxplot(maxUppeFence), 0]})`)
@@ -41,11 +43,34 @@ histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins) => {
     .attr("font-weight", "bold")
     .attr("x", (_, i) => xBins(i) + xBins.bandwidth() / 2)
     .attr("y", d => yCenter + - (yHeight(d.bin_height) / 2) - 5)
-    .text(d => d.bin_height)
+    .text(d => thousandFormat(+d.bin_height))
+
+  const maxDistance = scaleBoxplot.domain()[1]
+
+  const anomaliaScale = d3.scaleLinear()
+    .domain([maxUppeFence, maxDistance])
+    .range([0, innerWidth - scaleBoxplot(maxUppeFence)])
+
+  const xAxisAnomalia = d3.axisBottom(anomaliaScale)
+
+  svg.append("g")
+    .attr("class", "x-axis-anomalia")
+    .attr('transform', (_, i) => `translate(${[scaleBoxplot(maxUppeFence), 0]})`)
+    .call(xAxisAnomalia.tickValues([maxUppeFence, maxDistance]).tickFormat(kmFormat))
+    .append("text")
+    .attr("fill", '#b4464b')
+    .attr("text-anchor", "middle")
+    .attr("x", (innerWidth - maxUppeFence) / 2)
+    .attr("y", "-5")
+    .text(`Anomalias (${perc}%)`)
+
+  const kmBinsdWidth = (maxDistance - maxUppeFence) / bins
 
   hist.selectAll(".bins")
     .data(d => d.bins.map((d, i) => {
       d["index"] = i
+      d["start"] = maxUppeFence + (i * kmBinsdWidth)
+      d["end"] = maxUppeFence + ((i + 1) * kmBinsdWidth)
       return d
     }))
     .enter().append('line')
@@ -76,24 +101,9 @@ histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins) => {
       d3.select(e.currentTarget).attr('opacity', 0)
       showValues.attr('opacity', 0)
     })
-
-  const maxDistance = scaleBoxplot.domain()[1]
-
-  const outlierScale = d3.scaleLinear()
-    .domain([maxUppeFence, maxDistance])
-    .range([0, innerWidth - scaleBoxplot(maxUppeFence)])
-
-  const xAxisOutlier = d3.axisBottom(outlierScale)
-  svg.append("g")
-    .attr("class", "x-axis-outlier")
-    .attr('transform', (_, i) => `translate(${[scaleBoxplot(maxUppeFence), 0]})`)
-    .call(xAxisOutlier.tickValues([maxUppeFence, maxDistance]))
-    .append("text")
-    .attr("fill", '#b4464b')
-    .attr("text-anchor", "middle")
-    .attr("x", (innerWidth - maxUppeFence) / 2)
-    .attr("y", "-5")
-    .text("incomuns")
+    .on("click", (_, d) => {
+      getDataTable(d.start, d.end, false)
+    })
 
 
 }

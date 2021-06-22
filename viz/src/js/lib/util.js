@@ -1,10 +1,14 @@
+thousandFormat = n => n.toLocaleString('pt-BR')
+
+kmFormat = n => `${thousandFormat(d3.format(".0f")(n))}km`
+
 displayLoading = (show = true) => {
 
   const loading = `<img style="width: 25px; height: 25px" src="img/loading.svg"/>`
 
   if (show) {
     $("#loading").html(loading)
-    $("#status").html("Carregando da base de dados (isso pode demorar um pouco)...")
+    $("#status").html("Carregando da base de dado...")
     
     $("#total").html(loading)
     $("#incomuns").html(loading)
