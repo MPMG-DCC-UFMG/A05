@@ -1,5 +1,7 @@
 module.exports = (app) => {
 
+  const Papa = require('papaparse');
+  const fastcsv = require('fast-csv')
   fs = require('fs')
 
   const hive = app.services.hive
@@ -12,9 +14,32 @@ module.exports = (app) => {
     })
   }
 
-  dataFromFile = (competencia) => {
-    const filename = `src/data/${competencia}.json`
+  dataFromFile = (file, extension, competencia, start, end) => {
+    const filename = `src/data/${file}.${extension}`
     if (fs.existsSync(filename)) {
+      if (extension == 'csv')
+        return {
+          promise: (filename) => new Promise((resolve, reject) => {
+            const file = fs.createReadStream(filename)
+            const data = []
+            Papa.parse(file, {
+              header: true,
+              worker: true,
+              step: r => {
+                data.push(r.data)
+                /*if (+r.data.distancia_maxima >= +start && +r.data.distancia_maxima < +end)
+                  if (competencia != "todas")
+                    if (competencia.length == 4 && +r.data.competencia.slice(4) == +competencia)
+                      data.push(r.data)
+                    else
+                      data.push(r.data)*/
+              },
+              complete: () => resolve(data),
+              error: reject
+            })
+          }),
+          filename
+        }
       return fs.readFileSync(filename, 'utf8')
     }
     return []
@@ -109,13 +134,11 @@ module.exports = (app) => {
 
   controller.viz1 = async (req, res) => {
 
-    console.log(req.body)
-
     const { competencia, update } = req.body
 
     if (!update) {
       // VERIFICA SE O ARQUIVO DE RESULTADO (../data/*.json) EXISTE E POSSUI DADOS
-      const dataFile = dataFromFile(competencia)
+      const dataFile = dataFromFile(competencia, "json")
       if (dataFile != 0) {
         console.log("DATA FROM FILE")
         return res.status(200).json(JSON.parse(dataFile))
@@ -138,9 +161,49 @@ module.exports = (app) => {
 
     const periodo = competencia == "todas" ? "Todas" : competencia == "anos" ? "Por Ano" : competencia
 
-    const data = { date, boxplot, histogram, periodo, maxUppeFence, bins}
+    const data = { date, boxplot, histogram, periodo, maxUppeFence, bins }
 
     saveResultFile(data, competencia)
+
+    return res.status(200).json(data)
+
+  }
+
+  controller.detailViz1 = async (req, res) => {
+
+    const { competencia, start, end, update } = req.body
+
+    if (!update) {
+      // VERIFICA SE O ARQUIVO DE RESULTADO EXISTE E POSSUI DADOS
+      const { promise, filename } = dataFromFile("details", "csv")
+      const p = promise(filename)
+      const data = await p
+      if (data != 0) {
+        console.log("DATA FROM FILE")
+        return res.status(200).json(data)
+      }
+    }
+
+    /*const boxplot = await getBoxplotData(competencia)
+   
+    const maxUppeFence = Math.max.apply(Math, boxplot.map(d => {
+      const [q1, _, q3] = JSON.parse(d.percentils_25_50_75)
+      const step = (q3 - q1) * 1.5
+      return upperFence = q3 + step
+    }))
+   
+    const bins = 20
+   
+    const histogram = await getHistogramData(competencia, maxUppeFence, bins)
+   
+    const date = new Date().toString()
+   
+    const periodo = competencia == "todas" ? "Todas" : competencia == "anos" ? "Por Ano" : competencia
+   
+    const data = { date, boxplot, histogram, periodo, maxUppeFence, bins }
+   
+    saveResultFile(data, competencia)*/
+    const data = []
 
     return res.status(200).json(data)
 
