@@ -14,6 +14,8 @@ boxplot = (data, svg, measures, maxUppeFence, perc) => {
       }
     })
 
+  const mediaMediana = +data.reduce((sum, d) => +JSON.parse(d.percentils_25_50_75)[1] + sum, 0) / data.length
+
   const stats = quartiles.map(d => d3.boxplotStats(d.stats))
 
   const domain = [
@@ -47,6 +49,30 @@ boxplot = (data, svg, measures, maxUppeFence, perc) => {
 
   const boxplots = svg.append("g").attr('class', 'boxplots')
 
+  boxplots.append("line")
+    .attr('class', 'mediana')
+    .attr('stroke', "steelblue")
+    .attr('opacity', .5)
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', 4)
+    .attr('x1', scale(mediaMediana))
+    .attr('y1', 0)
+    .attr('x2', scale(mediaMediana))
+    .attr('y2', -innerHeight + margin.top + 25)
+    .transition()
+    .attr('transform', `translate(${[0, innerHeight - margin.bottom + 10]})`)
+
+  boxplots.append("text")
+    .attr('class', 'mediana-text')
+    .attr("fill", "steelblue")
+    .attr("text-anchor", "middle")
+    .attr('x', scale(mediaMediana))
+    .attr('y', 0)
+    .text(`${mediaMediana.toLocaleString('pt-br')}km`)
+    .transition()
+    .attr('transform', `translate(${[0, + margin.bottom + 10]})`)
+
+
   boxplots.selectAll('.boxplot').data(stats)
     .join('g')
     .attr('class', 'boxplot')
@@ -77,7 +103,7 @@ boxplot = (data, svg, measures, maxUppeFence, perc) => {
     .attr("class", "x-axis-normal")
     .call(xAxisNormal.tickValues([domainMin]).tickFormat(kmFormat))
     .append("text")
-    .attr("fill", "rgb(70, 130, 180)")
+    .attr("fill", "steelblue")
     .attr("text-anchor", "middle")
     .attr("x", scale((maxUppeFence - margin.left) / 2))
     .attr("y", "-5")

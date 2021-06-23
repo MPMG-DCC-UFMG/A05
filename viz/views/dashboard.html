@@ -264,11 +264,11 @@
                 <div class="card-body">
                   <div class="media">
                     <div class="d-inline-block mt-2 mr-3">
-                      <i class="nav-icon fas fa-th"></i>
+                      <i class="nav-icon fas fa-globe"></i>
                     </div>
                     <div class="media-body">
                       <h3 id="cardTotal" class="mb-2"></h3>
-                      <div class="mb-0 text-muted">Total</div>
+                      <div class="mb-0 text-muted"><small>Servidores/competência</small></div>
                     </div>
                   </div>
                 </div>
@@ -285,7 +285,7 @@
                     </div>
                     <div class="media-body">
                       <h3 id="cardNormal" class="mb-2"></h3>
-                      <div id="cardPercNormal" class="mb-0 text-muted">Normal</div>
+                      <div id="cardPercNormal" class="mb-0 text-muted"></div>
                     </div>
                   </div>
                 </div>
@@ -298,11 +298,45 @@
                 <div class="card-body">
                   <div class="media">
                     <div class="d-inline-block mt-2 mr-3">
-                      <i class="nav-icon fas fa-question"></i>
+                      <i class="nav-icon fas fa-mask"></i>
                     </div>
                     <div class="media-body">
                       <h3 id="cardAnomalia" class="mb-2"></h3>
-                      <div id="cardPercAnomalia" class="mb-0 text-muted">Anomalias</div>
+                      <div id="cardPercAnomalia" class="mb-0 text-muted"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ./card -->
+            <!-- card -->
+            <div class="col">
+              <div class="card card-shadow">
+                <div class="card-body">
+                  <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                      <i class="nav-icon fas fa-route"></i>
+                    </div>
+                    <div class="media-body">
+                      <h3 id="cardDistanciaMediana" class="mb-2"></h3>
+                      <div class="mb-0 text-muted"><small>Mediana (KM)</small></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ./card -->
+            <!-- card -->
+            <div class="col">
+              <div class="card card-shadow">
+                <div class="card-body">
+                  <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                      <i class="nav-icon fas fa-search-location"></i>
+                    </div>
+                    <div class="media-body">
+                      <h3 id="cardDistanciaLimite" class="mb-2"></h3>
+                      <div class="mb-0 text-muted"><small>Limite anormais (KM)</small></div>
                     </div>
                   </div>
                 </div>
@@ -310,8 +344,10 @@
             </div>
             <!-- ./card -->
           </div>
+
           <div class="row mx-0 mt-3">
             <div class="card w-100 card-shadow">
+
               <div id="boxplotViz" class="card-body">
 
               </div>
@@ -341,7 +377,7 @@
     <script src="js/lib/jquery.dataTables.min.js"></script>
     <script src="js/lib/adminlte.min.js"></script>
     <script src="js/lib/papaparse.min.js"></script>
- 
+
     <!-- FIM JS -->
     <!-- Layout adaptado de AdminLTE 3.1.0 (Licença: MIT - open source project) -->
 
@@ -370,7 +406,19 @@
         </button>
       </div>
       <div class="modal-body">
-        <table id="detalheDistancias"></table>
+        <table id="detalheDistancias" class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              <th>CNS</th>
+              <th>Nome</th>
+              <th>Competencia</th>
+              <th>Vinculo</th>
+              <th>Cidades</th>
+              <th>Qtd. cidades</th>
+              <th>Distância máxima</th>
+            </tr>
+          </thead>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>

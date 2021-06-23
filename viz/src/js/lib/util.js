@@ -9,14 +9,14 @@ displayLoading = (show = true) => {
   if (show) {
     $("#loading").html(loading)
     $("#status").html("Carregando da base de dado...")
-    
+
     $("#total").html(loading)
     $("#incomuns").html(loading)
     return
   }
   $("#loading").html("")
   $("#status").html("")
-  
+
   $("#total").html("")
   $("#incomuns").html("")
 }

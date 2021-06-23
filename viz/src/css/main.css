@@ -112,3 +112,7 @@ circle.outlier {
 .x-axis-normal line:last-child {
     opacity: 0;
 }
+
+.mediana-text {
+    font-size: 0.7em!important;
+}
