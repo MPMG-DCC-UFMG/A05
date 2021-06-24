@@ -247,7 +247,6 @@ module.exports = (app) => {
       const data = await p
       if (data != 0) {
         console.log("DATA FROM FILE")
-        console.log(pagination, data.length)
         const result = {
           "draw": req.body.draw,
           "recordsFiltered": data.length,
