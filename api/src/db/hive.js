@@ -20,6 +20,7 @@ module.exports = () => {
     maxpoolsize: 100,
     user: process.env.HIVE_USER,
     password: process.env.HIVE_PASS,
+    database: "trilhas",
     properties: {}
   };
 

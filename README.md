@@ -27,4 +27,4 @@ Ambos projetos podem ser execuados com:
 
 e para o VIZ funcionar corretamente é necessário que o API esteja sendo executado.
 
-Para navegar nas visualizações, abra [http://localhost:8000/dashboard](http://localhost:8000/dashboard) no navegador.
+Para navegar nas visualizações, abra [http://localhost:8000/](http://localhost:8000/) no navegador
