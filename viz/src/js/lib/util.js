@@ -1,3 +1,6 @@
+const API_HOST = "http://localhost"
+const API_PORT = "7000"
+
 thousandFormat = n => n.toLocaleString('pt-BR')
 
 kmFormat = n => `${thousandFormat(d3.format(".0f")(n))}km`

@@ -1,6 +1,8 @@
 $(function () {
 
   const mainDiv = "#boxplotViz"
+  const checkBoxplot = $("#displayNormalidade")
+  const checkHistogram = $("#displayAnomalias")
 
   plot = (data, update) => {
     const height = 450
@@ -38,9 +40,6 @@ $(function () {
 
     // NESTING HISTOGRAM DATA BY competencia
     const histogramNest = Array.from(d3.group(histogramData, d => d.competencia)).map(([k, v]) => { return { competencia: k, bins: v } })
-    /*console.log(Array.from(histogramNest, ([key, values]) => Object() { [key]: values }))
-
-    console.log(d3.max(histogramNest.map(d => d3.max(d.values.map(v => v.bin_height)))s))*/
 
     const total = +boxplotData.reduce((sum, d) => +d.qtde + sum, 0) / boxplotData.length
     const anomalias = +d3.format(".0f")(+histogramData.reduce((sum, d) => +d.bin_height + sum, 0) / histogramNest.length)
@@ -51,101 +50,27 @@ $(function () {
 
     $("#cardTotal").html(total.toLocaleString('pt-BR'))
     $("#cardAnomalia").html(`${anomalias.toLocaleString('pt-BR')}`)
-    $("#cardPercAnomalia").html(`<small>Anomalias</small> (${percAnomalis}%)`)
+    $("#cardPercAnomalia").html(`<small>Possíveis anomalias</small><br>(${percAnomalis}%)`)
     $("#cardNormal").html(`${normal.toLocaleString('pt-BR')}`)
-    $("#cardPercNormal").html(`<small>Normal</small> (${percNormal}%)`)
+    $("#cardPercNormal").html(`<small>Normalidade</small><br>(${percNormal}%)`)
 
-    $("#cardDistanciaMediana").html(`${mediaMediana.toLocaleString('pt-BR')}<small>km</small>`)
-    $("#cardDistanciaLimite").html(`${maxUppeFence.toLocaleString('pt-BR')}<small>km</small>`)
+    $("#cardDistanciaMediana").html(`${mediaMediana.toLocaleString('pt-BR')}`)
+    $("#cardDistanciaLimite").html(`${maxUppeFence.toLocaleString('pt-BR')}`)
 
     const measures = { height, width, margin, innerWidth, innerHeight }
+    const controls = { checkBoxplot, checkHistogram }
 
-    const scaleBoxplot = boxplot(boxplotData, svg, measures, maxUppeFence, percNormal)
-    histogram(histogramNest, svg, measures, scaleBoxplot, maxUppeFence, bins, percAnomalis)
+    const scaleBoxplot = boxplot(boxplotData, svg, measures, maxUppeFence, percNormal, controls)
+    histogram(histogramNest, svg, measures, scaleBoxplot, maxUppeFence, bins, percAnomalis, controls)
 
     //return { svg, measures: { height, width, margin, innerWidth, innerHeight } }
   }
 
-  let where = []
-
-  const dtViz1 = $("#detalheDistancias").DataTable({
-    "language": {
-      "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
-    },
-    "deferRender": true,
-    "processing": true,
-    "serverSide": true,
-    "order": [],
-    "searching": false,
-    "processing": true,
-    "deferLoading": 0,
-    "ajax": {
-      "url": 'http://localhost:7000/api/get_detail_viz_1/',
-      "type": "POST",
-      "contentType": "application/json",
-      "data": d => { return JSON.stringify({ ...d, where }) },
-    },
-    "columnDefs": [
-      {
-        // The `data` parameter refers to the data for the cell (defined by the
-        // `data` option, which defaults to the column being worked with, in
-        // this case `data: 0`.
-        "render": cidades => {
-          const cidadesUrl = JSON.parse(cidades).map(d => d.split().join("+")).join(",+MG/") + ",+MG/"
-          const href = `https://www.google.com/maps/dir/${cidadesUrl}`
-          const click = `<a href="${href}" target="_blank"><i class="fas fa-eye"></i></a>`
-          return `<ul>${JSON.parse(cidades).map(
-            d => `<li><small>${d}</small></li>`
-          ).join("")}</ul><br>${click}`
-        },
-        "targets": 4
-      },
-      //{ "visible": false,  "targets": [ 3 ] }
-    ],
-    /*"fields": [{
-      "label": "CNS:",
-      "name": "cns"
-    }, {
-      "label": "Nome:",
-      "name": "nome"
-    }, {
-      "label": "Competencia:",
-      "name": "competencia"
-    }, {
-      "label": "Cidades:",
-      "name": "list_cidades"
-    }, {
-      "label": "Qtd. cidades:",
-      "name": "qtd_cidades"
-    }, {
-      "label": "Distância máxima:",
-      "name": "distancia_maxima",
-    }],*/
-    /*"dom": '<"toolbar"><"top"i>rft<"bottom"lp><"clear">',
-    "autoWidth": false,
-    "processing": true,
-    "serverSide": true,
-    "orderable": false,
-    "ordering": false,
-    "searching": true,
-    "responsive": true,
-    "deferLoading": 0, // here
-    "ajax": {
-      "url": 'http://localhost:7000/api/get_detail_viz_1/',
-      "type": "POST",
-      "data": d => { return { ...d, where } },
-    },
-    //"pageLength": 10,
-    //PREVENT AJAX PRE-CALLING
-    "deferLoading": 57,*/
-  });
-
-  displayLoading()
-
   // EXIBI ICONES 'LOADING'
-  getData = (periodo, update) => {
+  getData = (update) => {
+    const periodo = $("#periodo").val()
     displayLoading()
-    d3.json('http://localhost:7000/api/get_data_viz_1/', {
+    d3.json(`${API_HOST}:${API_PORT}/api/get_data_viz_1/`, {
       method: "POST",
       body: JSON.stringify({
         "competencia": periodo
@@ -162,9 +87,66 @@ $(function () {
     })
   }
 
-  $("#periodo").change(() => getData($("#periodo").val(), true))
+  displayViz = (type, display) => {
+    const svg = d3.select(mainDiv).select("svg").select("g")
+  }
 
-  getData($("#periodo").val(), false)
+  let where = []
+
+  const dtViz1 = $("#detalheDistancias").DataTable({
+    "language": {
+      "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
+    },
+    "deferRender": true,
+    "processing": true,
+    "serverSide": true,
+    "order": [],
+    "searching": false,
+    "processing": true,
+    "deferLoading": 0,
+    "ajax": {
+      "url": `${API_HOST}:${API_PORT}/api/get_detail_viz_1/`,
+      "type": "POST",
+      "contentType": "application/json",
+      "data": d => { return JSON.stringify({ ...d, where }) },
+    },
+    "columnDefs": [
+      {
+        // The `data` parameter refers to the data for the cell (defined by the
+        // `data` option, which defaults to the column being worked with, in
+        // this case `data: 0`.
+        "render": cidades => {
+          const cidadesUrl = JSON.parse(cidades).map(d => d.split().join("+")).join(",+MG/") + ",+MG/"
+          const href = `https://www.google.com/maps/dir/${cidadesUrl}`
+          const click = `<a href="${href}" target="_blank"><i class="fas fa-map"></i></a>`
+          return `${click}<ul>${JSON.parse(cidades).map(
+            d => `<li><small>${d}</small></li>`
+          ).join("")}</ul>`
+        },
+        "targets": 4
+      },
+      { "className": "dt-center", "targets": "_all" },
+      //{ "visible": false,  "targets": [ 3 ] }
+    ],
+  })
+
+  displayLoading()
+
+  checkBoxplot.change(() => {
+    if (!checkBoxplot.is(":checked"))
+      checkHistogram.prop('checked', true)
+    getData(true)
+  })
+
+  checkHistogram.change(() => {
+    if (!checkHistogram.is(":checked"))
+      checkBoxplot.prop('checked', true)
+    getData(true)
+  })
+
+  $("#periodo").change(() => getData(true))
+
+  getData(false)
 
   getDataTable = (competencia, start, end, update) => {
     displayLoading()

@@ -38,8 +38,7 @@
     .form-inline .form-control-plaintext {
         display: inline-block;
     }
-    .form-inline .input-group,
-    .form-inline .custom-select {
+    .form-inline .input-group, .form-inline .custom-select {
         width: auto;
     }
     .form-inline .form-check {
@@ -86,18 +85,15 @@ svg.boxplot {
     stroke: #def;
 }
 
-.x-axis-anomalia path,
-.x-axis-anomalia line {
+.x-axis-anomalia path, .x-axis-anomalia line {
     stroke: #b4464b!important;
 }
 
-.x-axis-normal path,
-.x-axis-normal line {
+.x-axis-normal path, .x-axis-normal line {
     stroke: rgb(70, 130, 180)!important;
 }
 
-.y-axis path,
-.y-axis line {
+.y-axis path, .y-axis line {
     fill: none;
     stroke: none;
 }
@@ -106,13 +102,20 @@ circle.outlier {
     opacity: 0;
 }
 
-.x-axis-anomalia line:first-child,
-.x-axis-anomalia line:last-child,
-.x-axis-normal line:first-child,
-.x-axis-normal line:last-child {
+.x-axis-anomalia line:first-child, .x-axis-anomalia line:last-child, .x-axis-normal line:first-child, .x-axis-normal line:last-child {
     opacity: 0;
 }
 
 .mediana-text {
     font-size: 0.7em!important;
 }
+
+.table.dataTable {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 13px;
+}
+
+/*.custom-control-input:checked~.custom-control-label::before {
+    border-color: steelblue !important;
+    background-color: steelblue !important;
+}*/

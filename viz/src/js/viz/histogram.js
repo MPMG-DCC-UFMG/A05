@@ -15,7 +15,6 @@ histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins, perc) => {
     .paddingOuter(0.1)
 
   const maxHeight = d3.max(data.map(({ bins }) => d3.max(bins.map(d => +d.bin_height))))
-  console.log(maxHeight)
 
   const yHeight = d3.scaleLinear()
     .domain([0, maxHeight])
