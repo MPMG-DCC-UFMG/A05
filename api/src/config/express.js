@@ -23,6 +23,7 @@ module.exports = () => {
   app.use(cors());
   consign({ cwd: "src" })
     .then("services")
+    .then("models")
     .then("controllers")
     .then("routes")
     .into(app);
