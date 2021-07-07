@@ -50,7 +50,7 @@ histogram = (data, svg, measures, scaleBoxplot, maxUppeFence, bins, perc) => {
     .attr("text-anchor", "middle")
     .attr("x", (innerWidth - maxUppeFence) / 2)
     .attr("y", "-5")
-    .text(`Anomalias (${perc}%)`)
+    .text(`Possíveis anomalias (${perc}%)`)
 
   hist.selectAll(".bins")
     .data(d => d.bins)

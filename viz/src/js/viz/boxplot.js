@@ -34,9 +34,9 @@ boxplot = (data, svg, measures, maxUppeFence, perc, controls) => {
     .call(yAxis)
 
   // max RECEBE maxUppeFence
-  /*if (!controls.checkHistogram.is(":checked")) {
+  if (!controls.checkHistogram.is(":checked")) {
     quartiles.map(d => d.stats[d.stats.length - 1] = maxUppeFence)
-  }*/
+  }
 
   const stats = quartiles.map(d => d3.boxplotStats(d.stats))
 
@@ -50,11 +50,11 @@ boxplot = (data, svg, measures, maxUppeFence, perc, controls) => {
   if (!controls.checkHistogram.is(":checked")) {
     maxDomain = maxUppeFence
     // max RECEBE maxUppeFence
-    /*stats.map(d => {
+    stats.map(d => {
       d.points.map(p => p.outlier = false)
       d.whiskers[1].start = maxUppeFence
       d.whiskers[1].end = d.fiveNums[3]
-    })*/
+    })
   }
 
   const scale = d3.scaleLinear()
@@ -146,7 +146,7 @@ boxplot = (data, svg, measures, maxUppeFence, perc, controls) => {
     .attr("text-anchor", "middle")
     .attr("x", scale((maxUppeFence - margin.left) / 2))
     .attr("y", "-5")
-    .text(`Normal (${perc}%)`)
+    .text(`Normalidade (${perc}%)`)
 
   return scale
 }

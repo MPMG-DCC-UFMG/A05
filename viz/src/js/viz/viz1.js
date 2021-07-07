@@ -119,13 +119,17 @@ $(function () {
           const cidadesUrl = JSON.parse(cidades).map(d => d.split().join("+")).join(",+MG/") + ",+MG/"
           const href = `https://www.google.com/maps/dir/${cidadesUrl}`
           const click = `<a href="${href}" target="_blank"><i class="fas fa-map"></i></a>`
-          return `${click}<ul>${JSON.parse(cidades).map(
-            d => `<li><small>${d}</small></li>`
-          ).join("")}</ul>`
+          return `${click}<br>${JSON.parse(cidades).map(
+            d => `${d}`
+          ).join("<br>")}`
         },
         "targets": 4
       },
-      { "className": "dt-center", "targets": "_all" },
+      {
+        "render": distancia => parseInt(distancia),
+        "targets": 6
+      },
+      { "className": "dt-center", "targets": [0, 2, 3, 5, 6] },
       //{ "visible": false,  "targets": [ 3 ] }
     ],
   })
@@ -152,6 +156,9 @@ $(function () {
     displayLoading()
     where = { competencia, start, end }
     $("#modalDetalhes").modal('show')
+    $("#labelModalDistancia").html(`Detalhes: distâncias entre 
+      ${Math.round(start).toLocaleString('pt-BR')} Km e 
+      ${Math.round(end).toLocaleString('pt-BR')} Km`)
     dtViz1.ajax.reload()
     displayLoading(false)
   }
