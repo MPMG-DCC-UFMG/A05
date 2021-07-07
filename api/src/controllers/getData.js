@@ -9,6 +9,14 @@ module.exports = (app) => {
 
   const controller = {}
 
+  getDataFolder = () => {
+    dataFolder = `./src/data/`
+    if (!fs.existsSync(dataFolder)) {
+      fs.mkdirSync(dataFolder)
+    }
+    return dataFolder
+  }
+
   saveResultFile = (data, competencia) => {
     const filename = `src/data/${competencia}.json`
     fs.writeFile(filename, JSON.stringify(data), 'utf8', function (err) {
@@ -17,7 +25,8 @@ module.exports = (app) => {
   }
 
   dataFromFile = (file, extension, where) => {
-    const filename = `src/data/${file}.${extension}`
+    const filename = `${getDataFolder()}${file}.${extension}`
+    console.log(filename)
     if (fs.existsSync(filename)) {
       if (extension == 'csv') {
         const { competencia, start, end } = where
@@ -123,10 +132,12 @@ module.exports = (app) => {
 
     if (!update) {
       // VERIFICA SE O ARQUIVO DE RESULTADO EXISTE E POSSUI DADOS
-      const { promise, filename } = dataFromFile("details", "csv", where)
-      const p = promise(filename)
-      const data = await p
-      if (data != 0) {
+      const dataFile = dataFromFile("details", "csv", where)
+      console.log(dataFile, dataFile != 0)
+      if (dataFile != 0) {
+        const { promise, filename } = dataFile
+        const p = promise(filename)
+        const data = await p
         console.log("DATA FROM FILE")
         const result = {
           "draw": req.body.draw,
